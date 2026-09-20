@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No answer";
 
-    return res.status(200).json({ answer: text, reply: text });
+    return res.status(200).json({ answer: text, reply: text, text: text, response: text, message: text });
 
   } catch (err) {
     console.error("ERROR:", err.message);
