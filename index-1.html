@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cyber AI: hands-on learning path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF1F3; --surface:#FFFFFF; --ink:#16222C; --muted:#54646F; --line:#D3DCE1;
+  --study:#2F5D8A; --lab:#0E7C6B; --prove:#7A3E7A;
+  --accent:#0E7C6B; --accent-ink:#FFFFFF; --soft:#E3EAEE;
+  --head:"Bricolage Grotesque","Trebuchet MS","Segoe UI",sans-serif;
+  --body:"Public Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E161C; --surface:#16212A; --ink:#E7EEF2; --muted:#9BABB6; --line:#26343E;
+    --study:#7FB0DE; --lab:#4FC3AD; --prove:#D29AD2; --accent:#4FC3AD; --accent-ink:#06211C; --soft:#1C2A34;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E161C; --surface:#16212A; --ink:#E7EEF2; --muted:#9BABB6; --line:#26343E;
+  --study:#7FB0DE; --lab:#4FC3AD; --prove:#D29AD2; --accent:#4FC3AD; --accent-ink:#06211C; --soft:#1C2A34;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%;}
+main{max-width:720px;margin:0 auto;padding:28px 18px 150px;}
+h1{font-family:var(--head);font-weight:700;font-size:clamp(2.2rem,9vw,3.2rem);line-height:1.02;margin:0 0 10px;letter-spacing:-0.02em;}
+.lede{margin:0 0 22px;color:var(--muted);max-width:56ch;}
+.overall{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+.overall .bar{flex:1;height:8px;border-radius:99px;background:var(--soft);overflow:hidden;}
+.overall .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s ease;}
+.overall span{font-weight:600;font-size:.92rem;white-space:nowrap;}
+
+.ladder{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px 8px;scrollbar-width:thin;}
+.rung{flex:0 0 auto;min-width:124px;text-align:left;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px 12px;font:inherit;cursor:pointer;}
+.rung b{display:block;font-family:var(--head);font-size:.98rem;line-height:1.2;margin-bottom:2px;}
+.rung small{color:var(--muted);font-size:.8rem;}
+.rung .fill{display:block;height:4px;border-radius:99px;background:var(--soft);margin-top:8px;overflow:hidden;}
+.rung .fill i{display:block;height:100%;background:var(--accent);}
+.rung[aria-current="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+.blurb{margin:14px 0 16px;color:var(--muted);max-width:60ch;}
+
+.topic{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.topic.done{border-color:var(--accent);}
+.thead{display:flex;align-items:stretch;}
+.toggle{flex:1;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:14px 8px 14px 16px;cursor:pointer;min-width:0;}
+.toggle h2{font-family:var(--head);font-size:1.08rem;line-height:1.25;margin:0;font-weight:600;}
+.toggle p{margin:3px 0 0;color:var(--muted);font-size:.88rem;}
+.tick{flex:0 0 auto;width:56px;background:none;border:0;border-left:1px solid var(--line);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tick span{width:24px;height:24px;border-radius:7px;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;color:transparent;}
+.topic.done .tick span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.detail{padding:2px 16px 16px;border-top:1px solid var(--line);}
+.sec{border-left:3px solid var(--line);padding:2px 0 2px 12px;margin:14px 0 0;}
+.sec h3{margin:0 0 4px;font-size:.95rem;font-weight:600;}
+.sec.study{border-color:var(--study);} .sec.study h3{color:var(--study);}
+.sec.lab{border-color:var(--lab);} .sec.lab h3{color:var(--lab);}
+.sec.prove{border-color:var(--prove);} .sec.prove h3{color:var(--prove);}
+.sec ul{margin:0;padding-left:18px;} .sec li{margin:2px 0;} .sec p{margin:0;}
+.testout{margin:14px 0 0;padding:10px 12px;background:var(--soft);border-radius:8px;font-size:.92rem;}
+.testout b{font-weight:600;}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.btn{font:inherit;font-size:.9rem;font-weight:500;padding:9px 13px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+button:focus-visible,input:focus-visible{outline:3px solid var(--study);outline-offset:2px;}
+
+.askbar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));z-index:5;}
+.askbar form{display:none;}
+.askrow{max-width:720px;margin:0 auto;display:flex;gap:8px;}
+.askrow input{flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);}
+.askrow .btn{white-space:nowrap;}
+.sheet{position:fixed;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:6;padding:0 10px;}
+.sheet[hidden]{display:none;}
+.sheetin{max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-height:62vh;display:flex;flex-direction:column;box-shadow:0 8px 30px rgba(0,0,0,.18);}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);}
+.sheethead strong{font-family:var(--head);font-size:1rem;}
+.sheetbody{padding:12px 14px 16px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.96rem;}
+.note{color:var(--muted);font-size:.85rem;margin-top:24px;}
+
+:root{--danger:#B3402F;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--danger:#F08A7A;}}
+:root[data-theme="dark"]{--danger:#F08A7A;}
+.btn.small{padding:6px 10px;font-size:.82rem;}
+.btn.danger{color:var(--danger);border-color:var(--danger);}
+.btn:disabled{opacity:.45;cursor:default;}
+.rung.add{border-style:dashed;background:transparent;}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);background:var(--soft);}
+.levelTools{border:1px solid var(--line);border-radius:10px;margin:0 0 14px;}
+.movesel{font:inherit;font-size:.82rem;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%;}
+.form{padding:0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 16px 16px;margin:14px 0 16px;}
+.detail.noline{border-top:0;padding-top:6px;}
+.field{margin-top:12px;}
+.field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:4px;}
+.field input,.field textarea{width:100%;font:inherit;font-size:16px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical;}
+.hint{margin:4px 0 0;color:var(--muted);font-size:.8rem;}
+.err{margin:10px 0 0;color:var(--danger);font-size:.9rem;min-height:0;}
+.err:empty{display:none;}
+.footrow{margin-top:8px;}
+@media (prefers-reduced-motion: reduce){.overall .bar i{transition:none;}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Cyber AI</h1>
+  <p class="lede">A hands-on path from fundamentals to detection engineering and cloud security. Every topic tells you what to study, what to build, and what to show for it.</p>
+  <div class="overall"><div class="bar"><i id="overallFill"></i></div><span id="overallText"></span><button class="btn small" id="editToggle" type="button" aria-pressed="false">Edit path</button></div>
+  <nav class="ladder" id="ladder" aria-label="Levels"></nav>
+  <div id="levelHead"></div>
+  <div id="list"></div>
+  <div id="footer"></div>
+  <p class="note" id="note"></p>
+</main>
+
+<section class="sheet" id="sheet" hidden aria-live="polite">
+  <div class="sheetin">
+    <div class="sheethead"><strong id="sheetTitle">Cyber AI</strong><button class="btn" id="sheetClose" type="button">Close</button></div>
+    <div class="sheetbody" id="sheetBody"></div>
+  </div>
+</section>
+
+<div class="askbar" id="askbar" hidden>
+  <div class="askrow">
+    <input id="askInput" type="text" placeholder="Ask Cyber AI anything" autocomplete="off" enterkeyhint="send">
+    <button class="btn primary" id="askSend" type="button">Ask</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var DEFAULT_LEVELS=[
+{name:"Ground floor",blurb:"Fast pass. Read each test-out line. If you can do it cold, tick it and move on.",topics:[
+ {id:"g1",title:"Reading network traffic",check:"Can you explain from a packet capture why a TLS connection to a new domain looks suspicious?",
+  study:["TCP handshake, flags, resets, and what scans look like","DNS record types, TTLs, and signs of tunneling or DGA","HTTP methods, status codes, headers; TLS handshake, SNI, JA3"],
+  lab:"Capture your own browsing in Wireshark. Isolate one DNS lookup, one TLS handshake, and one HTTP request. Then script long random-subdomain DNS queries from a lab VM and find them in the capture.",
+  prove:"A one-page annotated pcap walkthrough with the display filters you used."},
+ {id:"g2",title:"Windows and Linux logs",check:"Can you name the event IDs for a new service, a scheduled task, and a failed logon without looking?",
+  study:["Windows Security IDs: 4624, 4625, 4688, 4697, 4768, 4769, 7045","Sysmon events 1, 3, 7, 11, 13 and what each one catches","Linux auth.log, journald, and auditd rules"],
+  lab:"In a VM, install Sysmon with a community config. Create a service and a scheduled task as an admin, then find both in the logs.",
+  prove:"A table mapping ten admin actions to the exact events they generate."},
+ {id:"g3",title:"Scripting for analysis",check:"Can you get the top ten source IPs from a 1 GB log in under a minute, in both Bash and Python?",
+  study:["Regex groups and lookaheads","Bash pipelines: grep, awk, sort, uniq, cut, jq","Python file parsing, API calls to enrichment services, pandas basics"],
+  lab:"Write one script that reads a firewall or auth log, extracts IPs, enriches them against a free threat-intel API, and outputs a ranked CSV.",
+  prove:"The script in a public GitHub repo with a README and sample data."},
+ {id:"g4",title:"Active Directory and Kerberos",check:"Can you explain a Kerberoasting attempt using only the fields of a 4769 event?",
+  study:["TGT and TGS flow, NTLM versus Kerberos","Groups, OUs, GPOs, and service accounts","Where AD attacks show up in logs: Kerberoasting, DCSync, pass-the-hash"],
+  lab:"Build a small AD lab from Windows Server evaluation ISOs. Create users and a service account, then watch 4768 and 4769 while you authenticate.",
+  prove:"A diagram of the Kerberos flow annotated with the event ID each step produces."},
+ {id:"g5",title:"Frameworks you actually use",check:"Can you map your last three real investigations to ATT&CK techniques?",
+  study:["ATT&CK tactics, techniques, and sub-techniques","Pyramid of Pain and the Diamond Model","Kill chain stages and where detections belong"],
+  lab:"Take three closed cases (sanitized, nothing confidential) and tag each stage with a technique ID.",
+  prove:"An ATT&CK Navigator layer file covering those techniques."}
+]},
+{name:"Analyst craft",blurb:"Sharpen what you do every day. The goal is faster, better-documented decisions.",topics:[
+ {id:"a1",title:"Triage method",check:"Can you write a defensible verdict for an alert in five lines?",
+  study:["Hypothesis first: what would make this true, and what would make it false","Evidence hierarchy and when to escalate","Writing verdicts that others can audit"],
+  lab:"Re-triage ten of your closed alerts with a fixed template: claim, evidence, alternative, verdict, next step. Note where your original call changes.",
+  prove:"Your triage template plus a short list of the patterns you got wrong."},
+ {id:"a2",title:"Endpoint investigation",check:"Can you spot a suspicious parent-child process pair in seconds?",
+  study:["Normal parent-child trees for Office, browsers, and services","LOLBins: rundll32, mshta, certutil, wmic, powershell","Persistence locations: run keys, tasks, services, WMI"],
+  lab:"Run three Atomic Red Team tests in a VM, then reconstruct each one from EDR or Sysmon telemetry only.",
+  prove:"A timeline for each test showing what you saw first and what you missed."},
+ {id:"a3",title:"Phishing and email analysis",check:"Can you tell from headers alone whether SPF, DKIM, and DMARC aligned?",
+  study:["Header chain, Received order, and spoofing indicators","SPF, DKIM, and DMARC alignment","URL and attachment triage in a sandbox"],
+  lab:"Analyze five public phishing samples in an isolated VM. Extract indicators and work out how a mail gateway rule could have caught each one.",
+  prove:"An IOC report and one proposed gateway rule per sample."},
+ {id:"a4",title:"Threat intel and pivoting",check:"Can you go from one bad domain to related infrastructure and rate your confidence?",
+  study:["Enrichment sources and their blind spots","Confidence, source reliability, and IOC expiry","Pivoting on certificates, ASN, registrant, and passive DNS"],
+  lab:"Start from a single recent malicious domain in a public feed and map five related indicators.",
+  prove:"A half-page intel brief with confidence ratings and recommended blocks."},
+ {id:"a5",title:"Incident response and reporting",check:"Can you defend a containment decision to a business owner?",
+  study:["NIST 800-61 phases and where they blur in practice","Containment trade-offs: isolate, block, disable, or monitor","Evidence handling and post-incident review"],
+  lab:"Run a solo tabletop for a ransomware scenario. Write down each decision and the data you would need to make it.",
+  prove:"A post-incident review with MTTD, MTTR, and three concrete improvements."}
+]},
+{name:"Detection engineering",blurb:"Your target role. Shift from closing alerts to building the detections that create them.",topics:[
+ {id:"d1",title:"Detection as code",check:"Can you show a detection rule with a test, a version history, and a rollback?",
+  study:["Sigma rule structure, logsources, and conditions","Git workflow for rules: pull requests, reviews, tags","Unit tests for detections using sample logs"],
+  lab:"Write three Sigma rules, convert them to SPL with sigma-cli, and add a positive and a negative test log for each.",
+  prove:"A GitHub repo of rules with tests running in CI."},
+ {id:"d2",title:"SPL and YARA-L depth",check:"Can you make a slow SPL search fast and explain why it was slow?",
+  study:["tstats, data models, and search-time versus index-time work","Subsearch and join costs","Chronicle YARA-L 2.0: events, match windows, outcomes"],
+  lab:"Rewrite one slow search with tstats and measure the difference. Then express the same behavior as a YARA-L rule.",
+  prove:"A before-and-after performance note with both queries."},
+ {id:"d3",title:"Purple teaming",check:"Can you say which of ten ATT&CK techniques your SIEM would actually catch?",
+  study:["Atomic Red Team and Caldera basics","Coverage versus quality: firing once is not detecting","Gap tracking and prioritization"],
+  lab:"Pick five techniques relevant to your environment and run the atomic tests. Record whether each alert fired, how fast, and how noisy it was.",
+  prove:"A coverage matrix with a ranked list of gaps."},
+ {id:"d4",title:"False-positive engineering",check:"Can you show the false-positive rate of one detection before and after your tuning?",
+  study:["Precision, recall, and alert fatigue as measurable things","Suppression design and the risk hidden in allowlists","Detection metadata: owner, severity, expected volume"],
+  lab:"Pull the numbers from your GSOAR tuning work: alerts per week, false positives, and analyst minutes per alert, before and after.",
+  prove:"A sanitized case study for your portfolio with a metrics chart."},
+ {id:"d5",title:"SOAR playbooks",check:"Can you build an enrich, score, and ticket flow that survives API failures?",
+  study:["Idempotency, retries, and timeouts","Secrets handling and approval gates for destructive actions","Measuring time saved"],
+  lab:"Build an enrichment playbook in Shuffle or plain Python that takes an IP alert, checks two sources, scores it, and opens a ticket.",
+  prove:"The playbook export with a README that shows the failure cases you handled."}
+]},
+{name:"Cloud and identity",blurb:"Where most new detections will live. Start with identity, then logging, then posture.",topics:[
+ {id:"c1",title:"Entra ID attacks and detections",check:"Can you tell token theft from a normal risky sign-in in the logs?",
+  study:["Sign-in and audit log fields, and conditional access outcomes","MFA fatigue, consent phishing, and token replay","Risky sign-ins versus risky users"],
+  lab:"In a free test tenant, generate impossible-travel and failed-MFA sign-ins, then find them in Log Analytics.",
+  prove:"Five KQL detections, each with the test that triggers it."},
+ {id:"c2",title:"KQL fluency",check:"Can you write a join, a time-binned summarize, and a parse without a reference?",
+  study:["where, project, summarize, bin, and join kinds","parse, extract, and mv-expand","Performance: filter early and avoid wide joins"],
+  lab:"Work through the Kusto Detective Agency cases, then rewrite two of your Splunk searches in KQL.",
+  prove:"A Splunk-to-KQL translation sheet built from your own queries."},
+ {id:"c3",title:"Cloud logging and IAM",check:"Can you find who created an access key last night in CloudTrail or the Azure Activity Log?",
+  study:["Shared responsibility and where logs live in AWS, Azure, and GCP","IAM policies, roles, and privilege escalation paths","Key detections: new keys, policy changes, disabled logging"],
+  lab:"In a free-tier account, turn on audit logging and do three risky actions: create a key, attach a broad policy, and disable a trail. Locate each event.",
+  prove:"Three cloud detections mapped to ATT&CK cloud techniques."},
+ {id:"c4",title:"Posture and infrastructure as code",check:"Can you spot a public storage bucket in a Terraform file?",
+  study:["CSPM ideas: drift, exposure, and risk ranking","Terraform basics and common misconfigurations","Scanning IaC before deployment"],
+  lab:"Scan a deliberately vulnerable Terraform repo with Checkov, fix five findings, and rescan.",
+  prove:"A before-and-after scan report with a short note per fix."},
+ {id:"c5",title:"Containers and Kubernetes",check:"Can you name three Kubernetes audit events worth alerting on?",
+  study:["Container isolation and escape basics","Kubernetes RBAC, secrets, and audit logs","Runtime detection with Falco"],
+  lab:"Run a local kind cluster, enable audit logging, deploy Falco, and trigger a shell inside a container.",
+  prove:"Two Falco or audit-log detections with the commands that trigger them."}
+]},
+{name:"Advanced",blurb:"Depth that separates strong engineers from good analysts. Work these after the earlier levels feel solid.",topics:[
+ {id:"x1",title:"Malware analysis",check:"Can you pull indicators from a sample without running it?",
+  study:["Static analysis: strings, imports, PE headers, entropy","Dynamic analysis: sandbox behavior, network callbacks, dropped files","Turning findings into detections"],
+  lab:"In an isolated VM with no route to your real network, analyze one training sample from a reputable teaching set and extract host and network indicators.",
+  prove:"A short report with the two detections you would deploy."},
+ {id:"x2",title:"Forensics",check:"Can you build a timeline from disk and memory evidence?",
+  study:["Volatility 3: processes, network connections, injected code","Windows artifacts: prefetch, shimcache, event logs, MFT","Timeline building and reporting"],
+  lab:"Work a public forensic image case from start to finish, from acquisition notes to findings.",
+  prove:"A timeline plus a findings report that someone else could follow."},
+ {id:"x3",title:"Threat hunting",check:"Can you form a testable hunt hypothesis from a threat report?",
+  study:["Hypothesis-driven hunting and the PEAK framework","Baselining normal so that rare stands out","Turning a successful hunt into a standing detection"],
+  lab:"Run two hunts on the public Splunk Boss of the SOC datasets, each starting from a written hypothesis.",
+  prove:"Two hunt reports and one new detection that came out of them."},
+ {id:"x4",title:"Offense to inform defense",check:"Can you say what telemetry each step of an attack leaves behind?",
+  study:["Recon, initial access, privilege escalation, and lateral movement basics","What each stage logs on Windows and Linux","Ethical and legal boundaries of testing"],
+  lab:"Complete three intermediate boxes on TryHackMe or Hack The Box. For each step, write the detection that would have caught it.",
+  prove:"Three write-ups that pair every attack step with its detection."},
+ {id:"x5",title:"AI for security",check:"Can you explain how an LLM triage assistant could be attacked?",
+  study:["Anomaly detection on logs: features, baselines, evaluation","LLM-assisted triage and its failure modes, including prompt injection through log content","Guardrails: human approval, allowlisted actions, logging"],
+  lab:"Train an isolation forest on authentication logs. Then build a small LLM alert summarizer with one hard rule: it can suggest but never act.",
+  prove:"A notebook with evaluation results and a threat model for the summarizer."}
+]}
+];
+
+var LEVELS=clone(DEFAULT_LEVELS);
+var state={done:{}}, cur=0, open={}, editMode=false, editing=null, confirmKey=null;
+var sample=null, doneDoc=null, curDoc=null, ctrl=null;
+var LS_DONE="cyberai.progress.v1", LS_CUR="cyberai.curriculum.v1";
+
+function $(id){return document.getElementById(id);}
+function el(tag,cls,text){var e=document.createElement(tag); if(cls)e.className=cls; if(text!=null)e.textContent=text; return e;}
+function clone(x){return JSON.parse(JSON.stringify(x));}
+function uid(){return "t"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function btn(label,cls,fn,aria){var b=el("button","btn"+(cls?" "+cls:""),label); b.type="button"; if(aria)b.setAttribute("aria-label",aria); b.addEventListener("click",fn); return b;}
+function totalTopics(){var n=0; LEVELS.forEach(function(l){n+=l.topics.length;}); return n;}
+function levelDone(l){var n=0; l.topics.forEach(function(t){if(state.done[t.id])n++;}); return n;}
+function doneCount(){var n=0; LEVELS.forEach(function(l){n+=levelDone(l);}); return n;}
+function findTopic(id){for(var i=0;i<LEVELS.length;i++){var ts=LEVELS[i].topics; for(var j=0;j<ts.length;j++){if(ts[j].id===id)return {li:i,ti:j,t:ts[j]};}} return null;}
+function validLevels(a){
+  return Array.isArray(a)&&a.length>0&&a.every(function(l){
+    return l&&typeof l.name==="string"&&Array.isArray(l.topics)&&l.topics.every(function(t){
+      return t&&typeof t.id==="string"&&typeof t.title==="string"&&Array.isArray(t.study);
+    });
+  });
+}
+
+/* saving */
+function makeSaver(getRef,getData,lsKey){
+  var saving=false,dirty=false;
+  return {
+    busy:function(){return saving;},
+    save:async function(){
+      var ref=getRef();
+      if(!ref){try{localStorage.setItem(lsKey,JSON.stringify(getData()));}catch(e){} return;}
+      dirty=true; if(saving)return; saving=true;
+      while(dirty){dirty=false; try{await ref.set(getData());}catch(e){console.error("save failed",e);break;}}
+      saving=false;
+    }
+  };
+}
+var doneSaver=makeSaver(function(){return doneDoc;},function(){return {done:Object.assign({},state.done)};},LS_DONE);
+var curSaver=makeSaver(function(){return curDoc;},function(){return {levels:clone(LEVELS)};},LS_CUR);
+
+/* state changes */
+function cancelEdit(){
+  if(editing){
+    if(editing.kind==="topic"&&editing.isNew){var f=findTopic(editing.id); if(f)LEVELS[f.li].topics.splice(f.ti,1);}
+    if(editing.kind==="level"&&editing.isNew&&editing.level){var i=LEVELS.indexOf(editing.level); if(i>=0)LEVELS.splice(i,1);}
+  }
+  editing=null;
+  if(cur>=LEVELS.length)cur=LEVELS.length-1;
+  if(cur<0)cur=0;
+}
+function mutate(fn,keepEdit){confirmKey=null; if(!keepEdit)cancelEdit(); fn(); curSaver.save(); render();}
+function ui(fn){confirmKey=null; cancelEdit(); fn(); render();}
+function toggleDone(id){confirmKey=null; if(state.done[id])delete state.done[id]; else state.done[id]=true; doneSaver.save(); render();}
+function dropDone(topics){topics.forEach(function(t){delete state.done[t.id];}); doneSaver.save();}
+
+/* render */
+function render(){
+  var n=totalTopics(), d=doneCount();
+  $("overallFill").style.width=(n?d/n*100:0)+"%";
+  $("overallText").textContent=d+" of "+n+" done";
+  var et=$("editToggle"); et.textContent=editMode?"Finish editing":"Edit path"; et.setAttribute("aria-pressed",String(editMode));
+  renderLadder(); renderLevelHead(); renderList(); renderFooter();
+  if(editing&&editing.scroll){
+    editing.scroll=false;
+    var fm=document.querySelector(".form");
+    if(fm){fm.scrollIntoView({block:"nearest"}); var inp=fm.querySelector("input"); if(inp)inp.focus();}
+  }
+}
+
+function renderLadder(){
+  var ladder=$("ladder"); ladder.textContent="";
+  LEVELS.forEach(function(l,i){
+    var b=el("button","rung"); b.type="button";
+    if(i===cur)b.setAttribute("aria-current","true");
+    var dn=levelDone(l);
+    b.appendChild(el("b",null,l.name||"Untitled level"));
+    b.appendChild(el("small",null,dn+" of "+l.topics.length));
+    var f=el("span","fill"),fi=el("i"); fi.style.width=(l.topics.length?dn/l.topics.length*100:0)+"%"; f.appendChild(fi); b.appendChild(f);
+    b.addEventListener("click",function(){ui(function(){cur=i;});});
+    ladder.appendChild(b);
+  });
+  if(editMode){
+    var a=el("button","rung add"); a.type="button";
+    a.appendChild(el("b",null,"Add level")); a.appendChild(el("small",null,"New rung at the end"));
+    a.addEventListener("click",function(){ui(function(){
+      var L={name:"",blurb:"",topics:[]}; LEVELS.push(L); cur=LEVELS.length-1;
+      editing={kind:"level",level:L,isNew:true,scroll:true};
+    });});
+    ladder.appendChild(a);
+  }
+}
+
+function field(label,node,id,hint){
+  var w=el("div","field"); var l=el("label",null,label); l.htmlFor=id; node.id=id;
+  w.appendChild(l); w.appendChild(node); if(hint)w.appendChild(el("p","hint",hint)); return w;
+}
+function ta(rows,val){var t=el("textarea"); t.rows=rows; t.value=val||""; return t;}
+
+function renderLevelHead(){
+  var h=$("levelHead"); h.textContent="";
+  var L=LEVELS[cur]; if(!L)return;
+  if(editing&&editing.kind==="level"&&editing.level===L){
+    var f=el("div","form card");
+    var name=el("input"); name.type="text"; name.value=L.name; name.maxLength=60;
+    var blurb=ta(3,L.blurb);
+    var err=el("p","err");
+    f.appendChild(field("Level name",name,"f-lname"));
+    f.appendChild(field("Short description",blurb,"f-lblurb","Optional. Say what this level is for."));
+    f.appendChild(err);
+    var row=el("div","actions");
+    row.appendChild(btn("Save level","primary",function(){
+      var v=name.value.trim(); if(!v){err.textContent="Give the level a name."; name.focus(); return;}
+      mutate(function(){L.name=v; L.blurb=blurb.value.trim(); editing=null;},true);
+    }));
+    row.appendChild(btn("Cancel","",function(){ui(function(){});}));
+    f.appendChild(row); h.appendChild(f); return;
+  }
+  h.appendChild(el("p","blurb",L.blurb||""));
+  if(editMode){
+    var t=el("div","tools levelTools");
+    t.appendChild(btn("Edit level","small",function(){ui(function(){editing={kind:"level",level:L,scroll:true};});}));
+    var l=btn("Move left","small",function(){mutate(function(){var i=LEVELS.indexOf(L); if(i>0){LEVELS.splice(i,1); LEVELS.splice(i-1,0,L); cur=i-1;}});}); l.disabled=cur===0; t.appendChild(l);
+    var r=btn("Move right","small",function(){mutate(function(){var i=LEVELS.indexOf(L); if(i>=0&&i<LEVELS.length-1){LEVELS.splice(i,1); LEVELS.splice(i+1,0,L); cur=i+1;}});}); r.disabled=cur===LEVELS.length-1; t.appendChild(r);
+    var dl=delBtn("l:"+cur,"Delete level","Confirm delete",function(){
+      var i=LEVELS.indexOf(L); if(i<0||LEVELS.length<2)return;
+      dropDone(L.topics); LEVELS.splice(i,1); if(cur>=LEVELS.length)cur=LEVELS.length-1;
+    }); dl.disabled=LEVELS.length<2; t.appendChild(dl);
+    h.appendChild(t);
+  }
+}
+
+function delBtn(key,label,confirmLabel,onConfirm){
+  var armed=confirmKey===key;
+  return btn(armed?confirmLabel:label,"small danger",function(){
+    if(!armed){confirmKey=key; render(); return;}
+    mutate(onConfirm);
+  });
+}
+
+function renderList(){
+  var list=$("list"); list.textContent="";
+  var L=LEVELS[cur]; if(!L)return;
+  if(!L.topics.length){list.appendChild(el("p","blurb",editMode?"No topics here yet. Use Add topic below.":"No topics here yet. Choose Edit path to add one."));}
+  L.topics.forEach(function(t,i){
+    if(editing&&editing.kind==="topic"&&editing.id===t.id){list.appendChild(topicForm(t));}
+    else list.appendChild(topicCard(t,i,L.topics.length));
+  });
+}
+
+function renderFooter(){
+  var f=$("footer"); f.textContent="";
+  if(!editMode)return;
+  var row=el("div","actions footrow");
+  row.appendChild(btn("Add topic","primary",function(){ui(function(){
+    var t={id:uid(),title:"",check:"",study:[],lab:"",prove:""};
+    LEVELS[cur].topics.push(t); editing={kind:"topic",id:t.id,isNew:true,scroll:true};
+  });}));
+  row.appendChild(delBtn("reset","Restore original path","Confirm restore",function(){LEVELS=clone(DEFAULT_LEVELS); cur=0;}));
+  f.appendChild(row);
+}
+
+function topicForm(t){
+  var card=el("article","topic form"); var d=el("div","detail noline");
+  var title=el("input"); title.type="text"; title.value=t.title; title.maxLength=120;
+  var check=ta(2,t.check), study=ta(5,(t.study||[]).join("\n")), lab=ta(4,t.lab), prove=ta(2,t.prove);
+  var err=el("p","err");
+  d.appendChild(field("Title",title,"f-title"));
+  d.appendChild(field("Test-out question",check,"f-check","A question you can answer cold if you already know this."));
+  d.appendChild(field("What to study",study,"f-study","One point per line."));
+  d.appendChild(field("Lab to run",lab,"f-lab"));
+  d.appendChild(field("What to show for it",prove,"f-prove"));
+  d.appendChild(err);
+  var row=el("div","actions");
+  row.appendChild(btn("Save topic","primary",function(){
+    var v=title.value.trim(); if(!v){err.textContent="Give the topic a title."; title.focus(); return;}
+    mutate(function(){
+      t.title=v; t.check=check.value.trim();
+      t.study=study.value.split("\n").map(function(s){return s.trim();}).filter(Boolean);
+      t.lab=lab.value.trim(); t.prove=prove.value.trim();
+      editing=null; open[t.id]=true;
+    },true);
+  }));
+  row.appendChild(btn("Cancel","",function(){ui(function(){});}));
+  d.appendChild(row); card.appendChild(d); return card;
+}
+
+function topicTools(t,ti,count){
+  var w=el("div","tools");
+  var up=btn("Move up","small",function(){mutate(function(){var f=findTopic(t.id); if(f&&f.ti>0){var a=LEVELS[f.li].topics; a.splice(f.ti,1); a.splice(f.ti-1,0,t);}});},"Move up: "+t.title); up.disabled=ti===0; w.appendChild(up);
+  var dn=btn("Move down","small",function(){mutate(function(){var f=findTopic(t.id); if(f){var a=LEVELS[f.li].topics; if(f.ti<a.length-1){a.splice(f.ti,1); a.splice(f.ti+1,0,t);}}});},"Move down: "+t.title); dn.disabled=ti===count-1; w.appendChild(dn);
+  w.appendChild(btn("Edit","small",function(){ui(function(){editing={kind:"topic",id:t.id,scroll:true};});},"Edit: "+t.title));
+  if(LEVELS.length>1){
+    var sel=el("select","movesel"); sel.setAttribute("aria-label","Move to another level: "+t.title);
+    var o0=el("option",null,"Move to level..."); o0.value=""; sel.appendChild(o0);
+    LEVELS.forEach(function(L,i){if(i!==cur){var o=el("option",null,L.name||"Untitled level"); o.value=String(i); o._lvl=L; sel.appendChild(o);}});
+    sel.addEventListener("change",function(){
+      var o=sel.options[sel.selectedIndex]; var tl=o&&o._lvl; if(!tl)return;
+      mutate(function(){
+        var f=findTopic(t.id); if(!f||LEVELS.indexOf(tl)<0)return;
+        LEVELS[f.li].topics.splice(f.ti,1); tl.topics.push(t); cur=LEVELS.indexOf(tl); open[t.id]=true;
+      });
+    });
+    w.appendChild(sel);
+  }
+  w.appendChild(delBtn("t:"+t.id,"Delete","Confirm delete",function(){
+    var f=findTopic(t.id); if(!f)return; LEVELS[f.li].topics.splice(f.ti,1); dropDone([t]);
+  }));
+  return w;
+}
+
+function topicCard(t,ti,count){
+  var isDone=!!state.done[t.id], isOpen=!!open[t.id];
+  var card=el("article","topic"+(isDone?" done":""));
+  var head=el("div","thead");
+  var tg=el("button","toggle"); tg.type="button"; tg.setAttribute("aria-expanded",String(isOpen));
+  tg.appendChild(el("h2",null,t.title));
+  tg.appendChild(el("p",null,isOpen?"Tap to collapse":"Study, lab, and proof of work"));
+  tg.addEventListener("click",function(){confirmKey=null; open[t.id]=!open[t.id]; render();});
+  var tk=el("button","tick"); tk.type="button";
+  tk.setAttribute("aria-label",(isDone?"Mark not done: ":"Mark done: ")+t.title);
+  tk.setAttribute("aria-pressed",String(isDone));
+  tk.appendChild(el("span",null,"\u2713"));
+  tk.addEventListener("click",function(){toggleDone(t.id);});
+  head.appendChild(tg); head.appendChild(tk); card.appendChild(head);
+  if(editMode)card.appendChild(topicTools(t,ti,count));
+
+  if(isOpen){
+    var d=el("div","detail");
+    if(t.check){var to=el("p","testout"); to.appendChild(el("b",null,"Test out first. ")); to.appendChild(document.createTextNode(t.check)); d.appendChild(to);}
+    if(t.study.length){var s1=el("div","sec study"); s1.appendChild(el("h3",null,"What to study")); var ul=el("ul"); t.study.forEach(function(x){ul.appendChild(el("li",null,x));}); s1.appendChild(ul); d.appendChild(s1);}
+    if(t.lab){var s2=el("div","sec lab"); s2.appendChild(el("h3",null,"Lab to run")); s2.appendChild(el("p",null,t.lab)); d.appendChild(s2);}
+    if(t.prove){var s3=el("div","sec prove"); s3.appendChild(el("h3",null,"What to show for it")); s3.appendChild(el("p",null,t.prove)); d.appendChild(s3);}
+    var act=el("div","actions");
+    act.appendChild(btn(isDone?"Mark not done":"I can already do this",isDone?"":"primary",function(){toggleDone(t.id);}));
+    if(sample){
+      [["Quiz me","Quiz me on this topic with 5 practical questions: give question 1 only, then wait for my answer."],
+       ["Walk me through the lab","Walk me through the lab step by step with exact tools, commands or queries where relevant, and what a correct result looks like."],
+       ["Make it harder","I already know the basics here. Give me a harder, more realistic version of the lab and what a senior detection engineer would check."]
+      ].forEach(function(p){act.appendChild(btn(p[0],"",function(){ask(p[1],t);}));});
+    }
+    d.appendChild(act); card.appendChild(d);
+  }
+  return card;
+}
+
+/* Ask Cyber AI */
+function buildPrompt(userText,topic){
+  var p="You are Cyber AI, a hands-on cybersecurity mentor for Jinoy, an experienced SOC analyst in India. "+
+  "His background: 3+ years in security operations; CrowdStrike EDR, Splunk, GSOAR, Chronicle, Azure AD, Microsoft Defender, Palo Alto firewalls, Mimecast; "+
+  "CompTIA Security+, CEH, CCNA; finishing an MCA in Cyber Security. His goal is detection engineering and cloud security.\n"+
+  "Rules: never just define terms. Tell him what to study, what to run or build, and how to prove he learned it. Skip basics he already knows from his background. "+
+  "Keep answers short and practical, use plain text with short paragraphs or numbered steps, no markdown symbols. "+
+  "Stay defensive and lab-safe: no working malware, exploit code, or attacks on systems he does not own.\n";
+  if(topic){
+    p+="Topic in focus: "+topic.title+". Study points: "+(topic.study||[]).join("; ")+". Lab: "+(topic.lab||"")+" Deliverable: "+(topic.prove||"")+"\n";
+  }
+  return p+"His request: "+userText;
+}
+async function ask(text,topic){
+  if(!text||!text.trim())return;
+  if(ctrl){try{ctrl.abort();}catch(e){}}
+  ctrl=new AbortController(); var mine=ctrl;
+  $("sheet").hidden=false;
+  $("sheetTitle").textContent=topic?topic.title:"Cyber AI";
+  $("sheetBody").textContent="Thinking...";
+  try{
+    var res=await fetch("/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt:buildPrompt(text,topic)}),signal:mine.signal});
+    if(!res.ok){
+      var m="That request failed. Try again.";
+      if(res.status===429)m="Too many requests. Wait a minute and try again.";
+      if(mine===ctrl)$("sheetBody").textContent=m;
+      return;
+    }
+    var j=await res.json();
+    if(mine===ctrl)$("sheetBody").textContent=j.text||"No response received. Try again.";
+  }catch(e){
+    if(e&&e.name==="AbortError")return;
+    if(mine===ctrl)$("sheetBody").textContent="That request failed. Check your connection and try again.";
+  }
+}
+
+function wire(){
+  $("editToggle").addEventListener("click",function(){ui(function(){editMode=!editMode;});});
+  $("sheetClose").addEventListener("click",function(){if(ctrl){try{ctrl.abort();}catch(e){}} $("sheet").hidden=true;});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("sheet").hidden){$("sheetClose").click();}});
+  function send(){var v=$("askInput").value; if(!v.trim())return; $("askInput").value=""; ask(v,null);}
+  $("askSend").addEventListener("click",send);
+  $("askInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();send();}});
+}
+
+async function init(){
+  try{var raw=localStorage.getItem(LS_DONE); if(raw){var o=JSON.parse(raw); state.done=(o&&o.done)?o.done:(o||{});}}catch(e){}
+  try{var rc=localStorage.getItem(LS_CUR); if(rc){var oc=JSON.parse(rc); if(oc&&validLevels(oc.levels))LEVELS=clone(oc.levels);}}catch(e){}
+  wire(); render();
+  var c=window.claude;
+  if(c&&typeof c.use==="function"){
+    try{
+      var db=await c.use("db");
+      if(db){
+        doneDoc=db.doc("progress/main");
+        doneDoc.onSnapshot(function(snap){
+          if(doneSaver.busy()||snap.metadata.hasPendingWrites)return;
+          var d=snap.exists&&snap.data()&&snap.data().done;
+          if(d){state.done=Object.assign({},d); render();}
+        },function(err){console.error("progress sync stopped",err); doneDoc=null;});
+        curDoc=db.doc("curriculum/main");
+        curDoc.onSnapshot(function(snap){
+          if(curSaver.busy()||snap.metadata.hasPendingWrites||editing)return;
+          var d=snap.exists&&snap.data();
+          if(d&&validLevels(d.levels)){LEVELS=clone(d.levels); if(cur>=LEVELS.length)cur=0; render();}
+        },function(err){console.error("path sync stopped",err); curDoc=null;});
+      }
+    }catch(e){console.error(e);}
+  }
+  sample=true; $("askbar").hidden=false; render();
+  $("note").textContent="Ask Cyber AI is a lighter tutor tuned to your background. For deeper sessions that use your full history, open the Cyber AI project in Claude.";
+}
+init();
+})();
+</script>
+</body>
+</html>
