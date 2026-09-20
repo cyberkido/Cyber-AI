@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const prompt = req.body?.prompt;
+  const { prompt } = req.body || {};
   if (typeof prompt !== "string" || !prompt.trim()) {
     res.status(400).json({ error: "Missing prompt" });
     return;
@@ -17,18 +17,19 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
-    console.error("GEMINI_API_KEY is not configured for this deployment");
+    console.error("GEMINI_API_KEY is not configured in this environment");
     res.status(500).json({ error: "Server is missing GEMINI_API_KEY" });
     return;
   }
 
   const model = (process.env.GEMINI_MODEL || "gemini-2.5-flash").trim();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
 
   try {
-    const upstream = await fetch(url, {
+    const gRes = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,33 +42,31 @@ export default async function handler(req, res) {
       signal: controller.signal,
     });
 
-    const raw = await upstream.text();
-    let data;
+    const raw = await gRes.text();
+    let data = null;
     try {
       data = raw ? JSON.parse(raw) : null;
     } catch {
       data = null;
     }
 
-    if (upstream.status === 429) {
+    if (gRes.status === 429) {
       res.status(429).json({ error: "Rate limited, try again shortly" });
       return;
     }
 
-    if (!upstream.ok) {
-      console.error("Gemini error:", upstream.status, raw);
-      res.status(502).json({
-        error: "Upstream error",
-        // Useful in the browser/Vercel logs without exposing the API key.
-        detail: data?.error?.message || `Gemini returned HTTP ${upstream.status}`,
-      });
+    if (!gRes.ok) {
+      const detail = data?.error?.message || raw || `Gemini returned HTTP ${gRes.status}`;
+      console.error("Gemini error:", gRes.status, detail);
+      res.status(502).json({ error: "Upstream error", detail });
       return;
     }
 
     const parts = data?.candidates?.[0]?.content?.parts || [];
-    const text = parts.map((part) => part.text || "").join("").trim();
+    const text = parts.map((p) => p.text || "").join("").trim();
+
     if (!text) {
-      console.error("Gemini returned no text:", raw);
+      console.error("Gemini returned no usable content:", raw);
       res.status(502).json({ error: "Gemini returned an empty response" });
       return;
     }
@@ -75,9 +74,12 @@ export default async function handler(req, res) {
     res.status(200).json({ text });
   } catch (err) {
     console.error("Tutor request failed:", err);
-    res.status(err?.name === "AbortError" ? 504 : 500).json({
-      error: err?.name === "AbortError" ? "Gemini request timed out" : "Request failed",
-    });
+    if (err?.name === "AbortError") {
+      res.status(504).json({ error: "Gemini request timed out" });
+      return;
+    }
+
+    res.status(500).json({ error: "Request failed" });
   } finally {
     clearTimeout(timeout);
   }
