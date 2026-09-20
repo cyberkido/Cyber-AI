@@ -1,86 +1,52 @@
-export const config = {
-  runtime: "nodejs",
-};
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    res.status(405).json({ error: "Method not allowed" });
-    return;
-  }
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
-  const { prompt } = req.body || {};
-  if (typeof prompt !== "string" || !prompt.trim()) {
-    res.status(400).json({ error: "Missing prompt" });
-    return;
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey) {
-    console.error("GEMINI_API_KEY is not configured in this environment");
-    res.status(500).json({ error: "Server is missing GEMINI_API_KEY" });
-    return;
-  }
-
-  const model = (process.env.GEMINI_MODEL || "gemini-2.5-flash").trim();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
-
+export async function POST(req) {
   try {
-    const gRes = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt.trim() }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
-      }),
-      signal: controller.signal,
+    const body = await req.json();
+    const prompt = body.message || body.prompt || "";
+
+    if (!prompt) {
+      return Response.json({ error: "No prompt provided" }, { status: 400 });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return Response.json({ error: "GEMINI_API_KEY not set in Vercel" }, { status: 500 });
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    // FIXED MODEL - 2.5-flash is dead for new users
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash" 
     });
 
-    const raw = await gRes.text();
-    let data = null;
-    try {
-      data = raw ? JSON.parse(raw) : null;
-    } catch {
-      data = null;
-    }
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-    if (gRes.status === 429) {
-      res.status(429).json({ error: "Rate limited, try again shortly" });
-      return;
-    }
+    return Response.json({ response: text });
 
-    if (!gRes.ok) {
-      const detail = data?.error?.message || raw || `Gemini returned HTTP ${gRes.status}`;
-      console.error("Gemini error:", gRes.status, detail);
-      res.status(502).json({ error: "Upstream error", detail });
-      return;
-    }
-
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    const text = parts.map((p) => p.text || "").join("").trim();
-
-    if (!text) {
-      console.error("Gemini returned no usable content:", raw);
-      res.status(502).json({ error: "Gemini returned an empty response" });
-      return;
-    }
-
-    res.status(200).json({ text });
-  } catch (err) {
-    console.error("Tutor request failed:", err);
-    if (err?.name === "AbortError") {
-      res.status(504).json({ error: "Gemini request timed out" });
-      return;
-    }
-
-    res.status(500).json({ error: "Request failed" });
-  } finally {
-    clearTimeout(timeout);
+  } catch (error) {
+    console.error("API Error:", error);
+    // Return 500 with message, not 502
+    return Response.json(
+      { error: error.message || "Gemini failed" }, 
+      { status: 500 }
+    );
   }
+}
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const prompt = searchParams.get("prompt");
+  if (!prompt) return Response.json({ error: "No prompt" }, { status: 400 });
+  
+  // reuse POST logic
+  return POST(new Request(req.url, {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
+  }));
 }
