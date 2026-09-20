@@ -1,52 +1,31 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export const runtime = "edge";
-export const dynamic = "force-dynamic";
+export default async function handler(req, res) {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' });
 
-export async function POST(req) {
   try {
-    const body = await req.json();
-    const prompt = body.message || body.prompt || "";
+    const { prompt, message } = req.body;
+    const userPrompt = prompt || message;
 
-    if (!prompt) {
-      return Response.json({ error: "No prompt provided" }, { status: 400 });
-    }
+    if (!userPrompt) return res.status(400).json({ error: 'No prompt' });
+    if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: 'GEMINI_API_KEY missing' });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return Response.json({ error: "GEMINI_API_KEY not set in Vercel" }, { status: 500 });
-    }
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // FIXED MODEL - 2.5-flash is dead for new users
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash" 
-    });
-
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(userPrompt);
     const text = result.response.text();
 
-    return Response.json({ response: text });
+    return res.status(200).json({ response: text });
 
-  } catch (error) {
-    console.error("API Error:", error);
-    // Return 500 with message, not 502
-    return Response.json(
-      { error: error.message || "Gemini failed" }, 
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
-}
-
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const prompt = searchParams.get("prompt");
-  if (!prompt) return Response.json({ error: "No prompt" }, { status: 400 });
-  
-  // reuse POST logic
-  return POST(new Request(req.url, {
-    method: "POST",
-    body: JSON.stringify({ prompt }),
-  }));
 }
