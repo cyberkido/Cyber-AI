@@ -15,9 +15,9 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
         },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile", // You can change this to another Groq model if preferred
-          messages: [{ role: "user", content: userPrompt }]
+       body: JSON.stringify({
+  model: "llama-3.1-8b-instant", // Updated model name
+  messages: [{ role: "user", content: userPrompt }]
         })
       }
     );
