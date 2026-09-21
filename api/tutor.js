@@ -16,7 +16,7 @@ export default async function handler(req, res) {
           "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
         },
        body: JSON.stringify({
-  model: "llama-3.1-8b-instant", // Updated model name
+  model: "deepseek-r1-distill-llama-70b", // Updated model name
   messages: [{ role: "user", content: userPrompt }]
         })
       }
